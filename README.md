@@ -1,6 +1,10 @@
 # Occamy Text
 
-__COMPONENT DESCRIPTION GOES HERE__
+Automatically resized text based on its parent size.
+
+>Occamy is choranaptyxic, meaning it will grow or shrink to fit available space
+>
+>-- <cite>Fantastic Beasts and Where to Find Them</cite>
 
 
 ## Demo & Examples
@@ -30,22 +34,37 @@ npm install react-occamy-text --save
 
 ## Usage
 
-__EXPLAIN USAGE HERE__
+Import it into your react project.
 
 ```
-var OccamyText = require('react-occamy-text');
-
-<OccamyText>Example</OccamyText>
+import OccamyText from 'react-occamy-text';
 ```
+
+Render it passing text as children .
+
+```
+<OccamyText>Lorem ipsum dolor sit amet</OccamyText>
+```
+
+It should not be used inside auto-sized (eg. `height: auto`) elements.
 
 ### Properties
 
-* __DOCUMENT PROPERTIES HERE__
+* children – the text that need to be resized
+* grow – true if the text can scale up its original size (default `true`)
+* maxFontSize – maximum font size in pixels (default `96`)
+* maxFontSizeVariation – maximum font size variation per iteration (default `8`)
+* maxHeight – maximum height (default `undefined`, parent height will be used instead)
+* minFontSize – minimum font size in pixels (default `4`)
+* minFontSizeVariation – minimum font size variation per iteration (default `0.3`)
+* shrink – true if the text can scale down its original size (default `true`)
 
 ### Notes
 
-__ADDITIONAL USAGE NOTES__
+OccamyText is rendered as a `div` with `occamy-text` class and `height: 100%` style defined inline to make it fits in its parent.
 
+## Tollerance
+The output text will not always *perfectly* fit the parent height, in some cases a subtile tollerance is accepted, giving always the larger text that doesn't exceed its parent.
 
 ## Development (`src`, `lib` and the build process)
 
@@ -55,7 +74,4 @@ To build, watch and serve the examples (which will also watch the component sour
 
 ## License
 
-__PUT LICENSE HERE__
-
-Copyright (c) 2016 Dario Carella.
-
+MIT
