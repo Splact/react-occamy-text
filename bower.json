@@ -1,0 +1,29 @@
+{
+  "name": "react-occamy-text",
+  "version": "0.0.0",
+  "description": "Occamy Text",
+  "main": "dist/react-occamy-text.min.js",
+  "homepage": "https://github.com/splact/react-occamy-text",
+  "authors": [
+    "Dario Carella"
+  ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "react",
+    "react-component"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".editorconfig",
+    ".gitignore",
+    "package.json",
+    "src",
+    "node_modules",
+    "example",
+    "test"
+  ]
+}
