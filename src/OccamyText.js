@@ -160,9 +160,13 @@ class OccamyText extends PureComponent {
 
   /** React **/
   render() {
-    const { children, className, props } = this.props;
+    const { children, className, style, props } = this.props;
 
     const wrapperClasses = className ? `${className} occamy-text` : 'occamy-text';
+    const wrapperStyle = {
+      ...style,
+      height: '100%',
+    };
 
     const contentStyle = {
       fontSize: this.fontSize ? `${this.fontSize}px` : null,
@@ -170,7 +174,12 @@ class OccamyText extends PureComponent {
     };
 
     return (
-      <div ref={ r => this.wrapper = r } className={ wrapperClasses } {...props}>
+      <div
+        ref={ r => this.wrapper = r }
+        className={ wrapperClasses }
+        style={ wrapperStyle }
+        {...props}
+      >
         <div
           ref={ r => this.content = r }
           className="occamy-text--content"
@@ -189,6 +198,7 @@ OccamyText.defaultProps = {
   minFontSize: 4,
   minFontSizeVariation: 0.3,
   shrink: true,
+  style: {},
 };
 OccamyText.propTypes = {
   children: PropTypes.node,
@@ -200,6 +210,7 @@ OccamyText.propTypes = {
   minFontSize: PropTypes.number,
   minFontSizeVariation: PropTypes.number,
   shrink: PropTypes.bool,
+  style: PropTypes.object,
 };
 
 
