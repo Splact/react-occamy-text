@@ -1,6 +1,6 @@
 {
   "name": "react-occamy-text",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Occamy Text",
   "main": "lib/OccamyText.js",
   "author": "Dario Carella",
