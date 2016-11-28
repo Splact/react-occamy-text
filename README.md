@@ -4,8 +4,11 @@
 >
 >-- <cite>Fantastic Beasts and Where to Find Them</cite>
 
+React component for automatically sized text that fits in its parent.
 
 ## Demo & Examples
+
+![Alt text](example/preview.png?raw=true "Example preview")
 
 Live demo: [splact.github.io/react-occamy-text](http://splact.github.io/react-occamy-text/)
 
