@@ -149,13 +149,13 @@ class OccamyText extends PureComponent {
       counter++;
     }
 
-    console.log('[OCCAMY_TEXT] found right font-size', {
-      fontSize: this.fontSize + 'px',
-      attempts: counter,
-      tollerance: Math.abs(this.maxHeight - this.content.offsetHeight) + 'px',
-      contentHeight: this.content.offsetHeight + 'px',
-      maxHeight: this.maxHeight + 'px',
-    });
+    // console.log('[OCCAMY_TEXT] found right font-size', {
+    //   fontSize: this.fontSize + 'px',
+    //   attempts: counter,
+    //   tollerance: Math.abs(this.maxHeight - this.content.offsetHeight) + 'px',
+    //   contentHeight: this.content.offsetHeight + 'px',
+    //   maxHeight: this.maxHeight + 'px',
+    // });
   }
 
   /** React **/
