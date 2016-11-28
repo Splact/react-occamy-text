@@ -7,6 +7,8 @@
 
 ## Demo & Examples
 
+Live demo: [splact.github.io/react-occamy-text](http://splact.github.io/react-occamy-text/)
+
 To build the examples locally, run:
 
 ```
