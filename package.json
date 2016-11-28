@@ -1,6 +1,6 @@
 {
   "name": "react-occamy-text",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatically resized text based on its parent size.",
   "main": "lib/OccamyText.js",
   "author": "Dario Carella",
