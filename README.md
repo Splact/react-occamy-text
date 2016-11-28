@@ -1,15 +1,11 @@
 # Occamy Text
 
-Automatically resized text based on its parent size.
-
 >Occamy is choranaptyxic, meaning it will grow or shrink to fit available space
 >
 >-- <cite>Fantastic Beasts and Where to Find Them</cite>
 
 
 ## Demo & Examples
-
-Live demo: [splact.github.io/react-occamy-text](http://splact.github.io/react-occamy-text/)
 
 To build the examples locally, run:
 

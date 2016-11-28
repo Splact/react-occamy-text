@@ -1,7 +1,7 @@
 {
   "name": "react-occamy-text",
   "version": "1.0.0",
-  "description": "Occamy Text",
+  "description": "Automatically resized text based on its parent size.",
   "main": "lib/OccamyText.js",
   "author": "Dario Carella",
   "homepage": "https://github.com/splact/react-occamy-text",
@@ -35,7 +35,7 @@
     "examples": "gulp dev:server",
     "lint": "eslint ./; true",
     "publish:site": "NODE_ENV=production gulp publish:examples",
-    "release": "NODE_ENV=production gulp release",
+    "release": "set NODE_ENV=production && gulp release",
     "start": "gulp dev",
     "test": "echo \"no tests yet\" && exit 0",
     "watch": "gulp watch:lib"
