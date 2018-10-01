@@ -1,29 +1,57 @@
-import React, {PureComponent, PropTypes} from 'react';
+/**
+ * @class OccamyText
+ */
+
+import * as React from 'react';
 
 
 const FONT_SIZE_VARIATION_DECREASE_FACTOR = 0.5;
 
+export type Props = {
+  children: React.ReactNode,
+  className: string,
+  grow: boolean,
+  maxFontSize: number,
+  maxFontSizeVariation: number,
+  maxHeight: number,
+  minFontSize: number,
+  minFontSizeVariation: number,
+  shrink: boolean,
+  style: object,
+}
 
-class OccamyText extends PureComponent {
-  constructor(props) {
+export default class OccamyText extends React.PureComponent<Props> {
+  maxHeight: number;
+  fontSize: number;
+  initialFontSize: number;
+  lineHeight: number | string | null;
+  variationStrategy: number | null;
+  isVariationStrategyChanged: boolean;
+  isImperfectionReached: boolean;
+  wrapper: HTMLElement | null;
+  content: HTMLElement | null;
+
+  static defaultProps = {
+    grow: true,
+    maxFontSize: 96,
+    maxFontSizeVariation: 8,
+    minFontSize: 4,
+    minFontSizeVariation: 0.3,
+    shrink: true,
+    style: {},
+  };
+
+  constructor(props: Props) {
     super(props);
 
     this.maxHeight = Infinity;
-    this.fontSize = null;
-    this.initialFontSize = null;
+    this.fontSize = -1;
+    this.initialFontSize = -1;
+    this.lineHeight = null;
     this.variationStrategy = null;
-    this.variationStrategyChanged = false;
-    this.reachedImperfection = false;
-
-    // refs
-    this.wrapper = null;
-
-    // binding methods
-    this.fontSizeCheck = this.fontSizeCheck.bind(this);
-    this.getFontSizeVariation = this.getFontSizeVariation.bind(this);
-    this.setRightFontSize = this.setRightFontSize.bind(this);
+    this.isVariationStrategyChanged = false;
+    this.isImperfectionReached = false;
   }
-
 
   /** React lifecycle **/
   componentWillMount() {
@@ -32,8 +60,12 @@ class OccamyText extends PureComponent {
     }
   }
   componentDidMount() {
+    if (!this.content) {
+      return;
+    }
+
     if (!this.props.maxHeight) {
-      this.maxHeight = this.wrapper.offsetHeight;
+      this.maxHeight = this.wrapper ? this.wrapper.offsetHeight : Infinity;
     }
 
     this.fontSize = parseInt(window.getComputedStyle(this.content).getPropertyValue('font-size'), 10);
@@ -50,24 +82,26 @@ class OccamyText extends PureComponent {
 
     this.setRightFontSize();
   }
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps() {
     if (this.props.maxHeight) {
       this.maxHeight = this.props.maxHeight;
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!this.props.maxHeight && this.maxHeight !== this.wrapper.offsetHeight) {
+  componentDidUpdate() {
+    if (!this.props.maxHeight && this.wrapper && this.maxHeight !== this.wrapper.offsetHeight) {
       this.maxHeight = this.wrapper.offsetHeight;
       this.setRightFontSize();
     }
   }
 
   /** Internal methods **/
-  fontSizeCheck() {
+  fontSizeCheck = () => {
+    if (!this.content) return 0;
     return this.content.offsetHeight - this.maxHeight;
   }
-  getFontSizeVariation(diff) {
+
+  getFontSizeVariation = (diff: number) => {
     const variationStrategy = (
       diff > 0 && -1
       || diff < 0 && 1
@@ -81,16 +115,16 @@ class OccamyText extends PureComponent {
     if (this.variationStrategy !== null) {
       if (this.variationStrategy !== variationStrategy) {
         // variation changed
-        if (this.variationStrategyChanged) {
+        if (this.isVariationStrategyChanged) {
           // already changed in a previous iteration: we need to stop iterations
-          this.reachedImperfection = true;
+          this.isImperfectionReached = true;
         } else {
-          this.variationStrategyChanged = true;
+          this.isVariationStrategyChanged = true;
         }
 
         this.variationStrategy = variationStrategy;
       } else {
-        this.variationStrategyChanged = false;
+        this.isVariationStrategyChanged = false;
       }
     } else {
       this.variationStrategy = variationStrategy;
@@ -107,13 +141,14 @@ class OccamyText extends PureComponent {
 
     return fontSizeVariation * this.variationStrategy;
   }
-  setRightFontSize() {
+
+  setRightFontSize = () => {
     let diff = this.fontSizeCheck();
-    this.variationStrategyChanged = false;
-    this.reachedImperfection = false;
+    this.isVariationStrategyChanged = false;
+    this.isImperfectionReached = false;
     let fontSizeVariation = this.getFontSizeVariation(diff);
     let nextFontSize = this.fontSize + fontSizeVariation;
-    let counter = 0;
+    // let counter = 0;
 
     // console.log('[OCCAMY_TEXT] fitting text', {
     // 	fontSize: this.fontSize + 'px',
@@ -125,8 +160,9 @@ class OccamyText extends PureComponent {
 
     // while the text is higher then its wrapper (or maxHeight props)
     while (
-      diff !== 0
-      && (!this.reachedImperfection || diff > 0)
+      this.content
+      && diff !== 0
+      && (!this.isImperfectionReached || diff > 0)
       && this.fontSize > this.props.minFontSize
       && this.fontSize < this.props.maxFontSize
       && (this.props.shrink || nextFontSize >= this.initialFontSize)
@@ -146,7 +182,7 @@ class OccamyText extends PureComponent {
       diff = this.fontSizeCheck();
       fontSizeVariation = this.getFontSizeVariation(diff);
       nextFontSize = this.fontSize + fontSizeVariation;
-      counter++;
+      // counter++;
     }
 
     // console.log('[OCCAMY_TEXT] found right font-size', {
@@ -158,9 +194,21 @@ class OccamyText extends PureComponent {
     // });
   }
 
-  /** React **/
+  /** Render **/
   render() {
-    const { children, className, style, props } = this.props;
+    const {
+      children,
+      className,
+      style,
+      grow: _,
+      maxFontSize: __,
+      maxFontSizeVariation: ___,
+      maxHeight: ____,
+      minFontSize: _____,
+      minFontSizeVariation: ______,
+      shrink: _______,
+      ...props
+    } = this.props;
 
     const wrapperClasses = className ? `${className} occamy-text` : 'occamy-text';
     const wrapperStyle = {
@@ -169,8 +217,8 @@ class OccamyText extends PureComponent {
     };
 
     const contentStyle = {
-      fontSize: this.fontSize ? `${this.fontSize}px` : null,
-      lineHeight: this.lineHeight ? `${this.lineHeight}em` : null,
+      fontSize: this.fontSize ? `${this.fontSize}px` : undefined,
+      lineHeight: this.lineHeight ? `${this.lineHeight}em` : undefined,
     };
 
     return (
@@ -189,29 +237,3 @@ class OccamyText extends PureComponent {
     );
   }
 }
-
-
-OccamyText.defaultProps = {
-  grow: true,
-  maxFontSize: 96,
-  maxFontSizeVariation: 8,
-  minFontSize: 4,
-  minFontSizeVariation: 0.3,
-  shrink: true,
-  style: {},
-};
-OccamyText.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-  grow: PropTypes.bool,
-  maxFontSize: PropTypes.number,
-  maxFontSizeVariation: PropTypes.number,
-  maxHeight: PropTypes.number,
-  minFontSize: PropTypes.number,
-  minFontSizeVariation: PropTypes.number,
-  shrink: PropTypes.bool,
-  style: PropTypes.object,
-};
-
-
-export default OccamyText;
