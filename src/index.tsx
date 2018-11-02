@@ -9,11 +9,11 @@ const FONT_SIZE_VARIATION_DECREASE_FACTOR = 0.5;
 
 export type Props = {
   children: React.ReactNode,
-  className: string,
+  className?: string,
   grow: boolean,
   maxFontSize: number,
   maxFontSizeVariation: number,
-  maxHeight: number,
+  maxHeight?: number,
   minFontSize: number,
   minFontSizeVariation: number,
   shrink: boolean,
