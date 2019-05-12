@@ -22,6 +22,7 @@ export type Props = {
 
 export default class OccamyText extends React.PureComponent<Props> {
   maxHeight: number;
+  maxWidth: number;
   fontSize: number;
   initialFontSize: number;
   lineHeight: number | string | null;
@@ -45,6 +46,7 @@ export default class OccamyText extends React.PureComponent<Props> {
     super(props);
 
     this.maxHeight = Infinity;
+    this.maxWidth = Infinity;
     this.fontSize = -1;
     this.initialFontSize = -1;
     this.lineHeight = null;
@@ -64,8 +66,12 @@ export default class OccamyText extends React.PureComponent<Props> {
       return;
     }
 
-    if (!this.props.maxHeight) {
-      this.maxHeight = this.wrapper ? this.wrapper.offsetHeight : Infinity;
+    if (this.wrapper) {
+      if (!this.props.maxHeight) {
+        this.maxHeight = this.wrapper.offsetHeight;
+      }
+
+      this.maxWidth = this.wrapper.offsetWidth;
     }
 
     this.fontSize = parseInt(window.getComputedStyle(this.content).getPropertyValue('font-size'), 10);
@@ -75,9 +81,10 @@ export default class OccamyText extends React.PureComponent<Props> {
     this.lineHeight = computedLineHeight > 0 ? computedLineHeight / this.fontSize : lineHeight;
 
     // console.log('[OCCAMY_TEXT] initial values', {
-    // 	fontSize: this.fontSize,
-    // 	maxHeight: this.maxHeight,
-    // 	lineHeight: this.lineHeight,
+    //   fontSize: this.fontSize,
+    //   maxHeight: this.maxHeight,
+    //   maxWidth: this.maxWidth,
+    //   lineHeight: this.lineHeight,
     // });
 
     this.setRightFontSize();
@@ -91,20 +98,40 @@ export default class OccamyText extends React.PureComponent<Props> {
   componentDidUpdate() {
     if (!this.props.maxHeight && this.wrapper) {
       this.maxHeight = this.wrapper.offsetHeight;
+      this.maxWidth = this.wrapper.offsetWidth;
       this.setRightFontSize();
     }
   }
 
   /** Internal methods **/
-  fontSizeCheck = () => {
-    if (!this.content) return 0;
-    return this.content.offsetHeight - this.maxHeight;
+  getSizeDiff = () => {
+    if (!this.content) {
+      return {
+        value: 0,
+        axis: 'x',
+      };
+    }
+
+    const x = this.content.scrollWidth - this.maxWidth;
+    const y = this.content.offsetHeight - this.maxHeight;
+
+    if (x > 0 && x > y) {
+      return {
+        value: x,
+        axis: 'x',
+      };
+    }
+
+    return {
+      value: y,
+      axis: 'y',
+    };
   }
 
-  getFontSizeVariation = (diff: number) => {
+  getFontSizeVariation = (diff: {value: number, axis: string}) => {
     const variationStrategy = (
-      diff > 0 && -1
-      || diff < 0 && 1
+      diff.value > 0 && -1
+      || diff.value < 0 && 1
       || 0
     );
 
@@ -130,7 +157,7 @@ export default class OccamyText extends React.PureComponent<Props> {
       this.variationStrategy = variationStrategy;
     }
 
-    const diffRatio = Math.abs(diff) / this.maxHeight;
+    const diffRatio = Math.abs(diff.value) / (diff.axis === 'x' ? this.maxWidth : this.maxHeight);
     let fontSizeVariation = diffRatio * this.fontSize * FONT_SIZE_VARIATION_DECREASE_FACTOR;
 
     if (fontSizeVariation < this.props.minFontSizeVariation) {
@@ -143,7 +170,11 @@ export default class OccamyText extends React.PureComponent<Props> {
   }
 
   setRightFontSize = () => {
-    let diff = this.fontSizeCheck();
+    if (!this.content) {
+      return false;
+    }
+
+    let diff = this.getSizeDiff();
     this.isVariationStrategyChanged = false;
     this.isImperfectionReached = false;
     let fontSizeVariation = this.getFontSizeVariation(diff);
@@ -151,18 +182,19 @@ export default class OccamyText extends React.PureComponent<Props> {
     // let counter = 0;
 
     // console.log('[OCCAMY_TEXT] fitting text', {
-    // 	fontSize: this.fontSize + 'px',
-    // 	contentHeight: this.content.offsetHeight + 'px',
-    // 	maxHeight: this.maxHeight + 'px',
-    // 	canGrow: this.props.grow,
-    // 	canShrink: this.props.shrink,
+    //   fontSize: this.fontSize + 'px',
+    //   contentHeight: this.content.offsetHeight + 'px',
+    //   contentWidth: this.content.scrollWidth + 'px',
+    //   maxHeight: this.maxHeight + 'px',
+    //   maxWidth: this.maxWidth + 'px',
+    //   canGrow: this.props.grow,
+    //   canShrink: this.props.shrink,
     // });
 
     // while the text is higher then its wrapper (or maxHeight props)
     while (
-      this.content
-      && diff !== 0
-      && (!this.isImperfectionReached || diff > 0)
+      diff.value !== 0
+      && (!this.isImperfectionReached || diff.value > 0)
       && this.fontSize > this.props.minFontSize
       && this.fontSize < this.props.maxFontSize
       && (this.props.shrink || nextFontSize >= this.initialFontSize)
@@ -174,12 +206,13 @@ export default class OccamyText extends React.PureComponent<Props> {
       this.content.setAttribute('style', `font-size: ${this.fontSize}px; line-height: ${this.lineHeight}`);
 
       // console.log('[OCCAMY_TEXT] trying new font-size', {
-      // 	newFontSize: this.fontSize + 'px',
-      // 	fontSizeVariation: fontSizeVariation + 'px',
-      // 	contentHeight: this.content.offsetHeight + 'px',
+      //   newFontSize: this.fontSize + 'px',
+      //   fontSizeVariation: fontSizeVariation + 'px',
+      //   contentHeight: this.content.offsetHeight + 'px',
+      //   contentWidth: this.content.scrollWidth + 'px',
       // });
 
-      diff = this.fontSizeCheck();
+      diff = this.getSizeDiff();
       fontSizeVariation = this.getFontSizeVariation(diff);
       nextFontSize = this.fontSize + fontSizeVariation;
       // counter++;
@@ -190,8 +223,12 @@ export default class OccamyText extends React.PureComponent<Props> {
     //   attempts: counter,
     //   tollerance: Math.abs(this.maxHeight - this.content.offsetHeight) + 'px',
     //   contentHeight: this.content.offsetHeight + 'px',
+    //   contentWidth: this.content.scrollWidth + 'px',
     //   maxHeight: this.maxHeight + 'px',
+    //   maxWidth: this.maxWidth + 'px',
     // });
+
+    return true;
   }
 
   /** Render **/
