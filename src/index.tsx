@@ -89,7 +89,7 @@ export default class OccamyText extends React.PureComponent<Props> {
   }
 
   componentDidUpdate() {
-    if (!this.props.maxHeight && this.wrapper && this.maxHeight !== this.wrapper.offsetHeight) {
+    if (!this.props.maxHeight && this.wrapper) {
       this.maxHeight = this.wrapper.offsetHeight;
       this.setRightFontSize();
     }
